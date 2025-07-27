@@ -1,6 +1,6 @@
 // 验证注册请求
 const validateRegister = (req, res, next) => {
-    const {username, password, email, phone, role} = req.body;
+    const {username, password, email, phone, role, } = req.body;
 
     // 基本验证
     if (!username || !password) {

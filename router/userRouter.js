@@ -20,6 +20,10 @@ router.post('/logout', authenticate, userController.logout);
 // 刷新访问令牌（公开接口，用刷新令牌换取新的访问令牌）
 router.post('/refresh-token', userController.refreshToken);
 
+// 新增：获取最新用户协议（公开接口）
+router.get('/terms/latest', userController.getLatestTerms);
 
+// 新增：用户同意协议（需登录）
+router.post('/terms/agree', authenticate, userController.agreeToTerms);
 
 module.exports = router;
