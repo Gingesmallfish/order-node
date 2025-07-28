@@ -60,21 +60,6 @@ const User = sequelize.define('User', {
         onUpdate: DataTypes.NOW,
         comment: '更新时间'
     },
-    agreed_to_terms: {
-        type: DataTypes.TINYINT,
-        defaultValue: 0,
-        comment: '是否同意用户协议：0-不同意，1-同意'
-    },
-    terms_accepted_at: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        comment: '协议接受时间'
-    },
-    terms_version: {
-        type: DataTypes.STRING(20),
-        allowNull: true,
-        comment: '协议版本'
-    }
 }, {
     tableName: 'users',
     timestamps: false,  // 禁用自动添加的createdAt和updatedAt字段

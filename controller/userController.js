@@ -28,7 +28,7 @@ const generateTokens = (userId) => {
 // 用户注册
 const register = async (req, res) => {
     try {
-        const { username, password, email, phone, role = 0 } = req.body;
+        const { username, password, email, phone, role = 0  } = req.body;
 
         // 检查用户名/邮箱/手机号是否已存在
         const existingUser = await User.findOne({
@@ -59,7 +59,7 @@ const register = async (req, res) => {
             password: hashedPassword,
             email: email || null,
             phone: phone || null,
-            role,
+            role
         });
 
         // 生成双令牌
@@ -292,7 +292,7 @@ const agreeToTerms = async (req, res) => {
         // 1. 验证版本是否为最新有效版本
         const validTerm = await Terms.findOne({
             where: {
-                version,
+                version: String(version),
                 is_latest: 1 // 必须是当前生效的最新版本
             }
         });

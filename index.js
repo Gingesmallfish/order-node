@@ -13,6 +13,7 @@ app.use(cors(
     {
         origin: '*', // 允许所有源访问
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 允许的请求方法
+        allowedHeaders: ['Content-Type', 'Authorization'], // 允许认证头
         preflightContinue: false, // 允许预检请求继续执行
         optionsSuccessStatus: 204 // 预检请求成功返回的状态码
     }
