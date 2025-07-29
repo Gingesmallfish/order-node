@@ -69,7 +69,7 @@ const register = async (req, res) => {
         await redisClient.set(`user:${user.id}:accessToken`, accessToken, { EX: 900 });
         await redisClient.set(`user:${user.id}:refreshToken`, refreshToken, { EX: 604800 });
 
-        res.status(201).json({
+        res.status(200).json({
             message: '注册成功',
             accessToken,
             refreshToken,
@@ -221,7 +221,6 @@ const logout = async (req, res) => {
     try {
         const userId = req.user.id;
         const authHeader = req.headers.authorization;
-
         // 从请求头获取当前访问令牌
         let accessToken = null;
         if (authHeader && authHeader.startsWith('Bearer ')) {
