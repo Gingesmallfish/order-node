@@ -3,9 +3,9 @@ servers:
   - url: http://localhost:3000 # 开发环境
     description: 本地开发环境
 info:
-  title: 接单平台接口文档
+  title: 校园接单平台接口文档
   version: 1.0.0
-  description: 接单平台接口文档
+  description: 校园接单平台接口文档
 
 components:
   securitySchemes:
@@ -167,3 +167,42 @@ paths:
         '401':
           description: 未授权访问
 
+  /menus/list:
+    post:
+      summary: 获取侧边栏菜单列表（树形结构）
+      tags: [菜单管理]
+      responses:
+        '200':
+          description: 成功响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: { type: integer, example: 200 }
+                  message: { type: string, example: "查询成功" }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        parent_id: { type: integer }
+                        menu_name: { type: string }
+                        path: { type: string }
+                        icon: { type: string }
+                        menu_type: { type: string, enum: [CATALOG, MENU] }
+                        order_num: { type: integer }
+                        component: { type: string }
+                        is_show: { type: boolean }
+                        children: { type: array, items: {} } # 递归子菜单
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: { type: integer, example: 500 }
+                  message: { type: string, example: "服务器内部错误" }
+                  error: { type: string }

@@ -12,14 +12,14 @@ const generateTokens = (userId) => {
     const accessToken = jwt.sign(
         { userId },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m' }
+        { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '7d' }
     );
 
     // 刷新令牌 - 长期有效(7天)，用于获取新的访问令牌
     const refreshToken = jwt.sign(
         { userId },
         process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
+        { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '15' }
     );
 
     return { accessToken, refreshToken };
@@ -70,6 +70,7 @@ const register = async (req, res) => {
         await redisClient.set(`user:${user.id}:refreshToken`, refreshToken, { EX: 604800 });
 
         res.status(200).json({
+            code: 200,
             message: '注册成功',
             accessToken,
             refreshToken,
@@ -116,12 +117,13 @@ const login = async (req, res) => {
         }
 
         // 单点登录：将旧令牌加入黑名单
-        const existingAccessToken = await redisClient.get(`user:${user.id}:accessToken`);
+        const existingAccessToken = await redisClient.get(`user:${user.id}:accessToken`); // 获取旧令牌
         if (existingAccessToken) {
             const decoded = jwt.decode(existingAccessToken);
             if (decoded && decoded.exp) {
                 const now = Math.floor(Date.now() / 1000);
                 const ttl = decoded.exp - now;
+                // 如果令牌未过期，则将其加入黑名单
                 if (ttl > 0) {
                     await redisClient.set(`blacklist:${existingAccessToken}`, 'invalid', { EX: ttl });
                 }
@@ -132,8 +134,8 @@ const login = async (req, res) => {
         const { accessToken, refreshToken } = generateTokens(user.id);
 
         // 存储新令牌到Redis（覆盖旧的）
-        await redisClient.set(`user:${user.id}:accessToken`, accessToken, { EX: 900 });
-        await redisClient.set(`user:${user.id}:refreshToken`, refreshToken, { EX: 604800 });
+        await redisClient.set(`user:${user.id}:accessToken`, accessToken, { EX: 604800 }); // 7天
+        await redisClient.set(`user:${user.id}:refreshToken`, refreshToken, { EX: 900 }); // 15分钟过
 
         // 更新最后登录时间
         await user.update({ last_login_time: new Date() });
@@ -249,7 +251,6 @@ const logout = async (req, res) => {
         res.status(500).json({ message: '退出登录失败' });
     }
 };
-
 
 // 新增：获取最新用户协议
 const getLatestTerms = async (req, res) => {
